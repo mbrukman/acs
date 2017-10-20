@@ -671,44 +671,5 @@
                 </plugins>
             </build>
         </profile>
-
-        <profile>
-            <id>predix-titan</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.ge.predix.audit</groupId>
-                    <artifactId>audit-sdk</artifactId>
-                    <version>${audit-sdk.version}</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>commons-io</groupId>
-                            <artifactId>commons-io</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>io.netty</groupId>
-                            <artifactId>netty-tcnative-boringssl-static</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>io.grpc</groupId>
-                            <artifactId>grpc-stub</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>io.grpc</groupId>
-                            <artifactId>grpc-protobuf</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>io.grpc</groupId>
-                    <artifactId>grpc-stub</artifactId>
-                    <version>1.0.1</version>
-                </dependency>
-                <dependency>
-                    <groupId>io.grpc</groupId>
-                    <artifactId>grpc-protobuf</artifactId>
-                    <version>1.0.1</version>
-                </dependency>
-            </dependencies>
-        </profile>
     </profiles>
 </project>
