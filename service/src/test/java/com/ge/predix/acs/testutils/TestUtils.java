@@ -26,6 +26,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.testng.Assert;
 
 import com.ge.predix.acs.rest.Zone;
 import com.ge.predix.acs.zone.management.ZoneService;
@@ -113,5 +114,18 @@ public class TestUtils {
         result.setBuilder(MockMvcRequestBuilders.post(new URI("http://" + subdomain + ".localhost/" + resourceURI)));
         result.setMockMvc(MockMvcBuilders.webAppContextSetup(wac).defaultRequest(result.getBuilder()).build());
         return result;
+    }
+
+    public static class TestAssertion {
+        public static void assertDoesNotThrow(final Class<?> unexpectedException, final Runnable executableCode) {
+            try {
+                executableCode.run();
+            } catch (Exception e) {
+                if (e.getClass() == unexpectedException) {
+                    Assert.fail();
+                }
+                throw e;
+            }
+        }
     }
 }
