@@ -106,8 +106,10 @@ public class SubjectPrivilegeManagementControllerIT extends AbstractTestNGSpring
         MockAcsRequestContext.mockAcsRequestContext(this.testZone);
 
         BaseSubject subject = JSON_UTILS.deserializeFromFile("controller-test/a-subject.json", BaseSubject.class);
-        MockMvcContext putContext = TEST_UTILS.createWACWithCustomPUTRequestBuilder(this.wac, "zoneDoesNotExist", SUBJECT_BASE_URL + '/' + subject.getSubjectIdentifier());
-        putContext.getMockMvc().perform(putContext.getBuilder().contentType(MediaType.APPLICATION_JSON).content(OBJECT_MAPPER.writeValueAsString(subject))).andExpect(status().isBadRequest());
+        MockMvcContext putContext = TEST_UTILS.createWACWithCustomPUTRequestBuilder(this.wac,
+                "zoneDoesNotExist", SUBJECT_BASE_URL + '/' + subject.getSubjectIdentifier());
+        putContext.getMockMvc().perform(putContext.getBuilder().contentType(MediaType.APPLICATION_JSON).
+                content(OBJECT_MAPPER.writeValueAsString(subject))).andExpect(status().isBadRequest());
     }
 
     @Test

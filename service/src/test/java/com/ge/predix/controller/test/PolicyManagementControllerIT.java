@@ -16,6 +16,27 @@
 
 package com.ge.predix.controller.test;
 
+import static com.ge.predix.acs.commons.web.AcsApiUriTemplates.POLICY_SET_URL;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.net.URI;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.web.context.WebApplicationContext;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -30,25 +51,6 @@ import com.ge.predix.acs.testutils.TestActiveProfilesResolver;
 import com.ge.predix.acs.testutils.TestUtils;
 import com.ge.predix.acs.utils.JsonUtils;
 import com.ge.predix.acs.zone.management.ZoneService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.context.WebApplicationContext;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import java.net.URI;
-
-import static com.ge.predix.acs.commons.web.AcsApiUriTemplates.POLICY_SET_URL;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebAppConfiguration
 @ContextConfiguration("classpath:controller-tests-context.xml")
@@ -81,11 +83,30 @@ public class PolicyManagementControllerIT extends AbstractTestNGSpringContextTes
         this.testZone2 = new TestUtils().createTestZone("PolicyMgmtControllerIT2");
         this.zoneService.upsertZone(this.testZone);
         this.zoneService.upsertZone(this.testZone2);
-        MockSecurityContext.mockSecurityContext(this.testZone);
-        MockAcsRequestContext.mockAcsRequestContext(this.testZone);
         this.policySet = this.jsonUtils.deserializeFromFile("controller-test/complete-sample-policy-set.json",
                 PolicySet.class);
         Assert.assertNotNull(this.policySet, "complete-sample-policy-set.json file not found or invalid");
+    }
+
+    @BeforeMethod
+    public void beforeMethod() {
+        MockSecurityContext.mockSecurityContext(this.testZone);
+        MockAcsRequestContext.mockAcsRequestContext(this.testZone);
+    }
+
+    @Test
+    public void policyZoneDoesNotExistException() throws Exception {
+        // NOTE: To throw a ZoneDoesNotExistException, we must ensure that the AcsRequestContext in the
+        //       SpringSecurityZoneResolver class returns a null ZoneEntity
+        MockSecurityContext.mockSecurityContext(null);
+        MockAcsRequestContext.mockAcsRequestContext(this.testZone);
+
+        String thisUri = VERSION + "/policy-set/" + this.policySet.getName();
+        // create policy-set in first zone
+        MockMvcContext putContext = this.testUtils.createWACWithCustomPUTRequestBuilder(this.wac,
+                this.testZone.getSubdomain(), thisUri);
+        putContext.getMockMvc().perform(putContext.getBuilder().contentType(MediaType.APPLICATION_JSON)
+                .content(this.objectWriter.writeValueAsString(this.policySet))).andExpect(status().isBadRequest());
     }
 
     public void testCreateSamePolicyDifferentZones() throws Exception {
@@ -117,7 +138,7 @@ public class PolicyManagementControllerIT extends AbstractTestNGSpringContextTes
                 .andExpect(jsonPath("name").value(policySetName)).andExpect(jsonPath("policies").isArray())
                 .andExpect(jsonPath("policies[1].target.resource.attributes[0].name").value("group"));
     }
-    
+
     @Test
     public void testCreateMultiplePolicySets() throws Exception {
         //create first policy set
@@ -131,7 +152,7 @@ public class PolicyManagementControllerIT extends AbstractTestNGSpringContextTes
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("name").value(policySetName)).andExpect(jsonPath("policies").isArray())
                 .andExpect(jsonPath("policies[1].target.resource.attributes[0].name").value("group"));
-        
+
         String policySet2Name = "";
         try {
             //create second policy set
@@ -147,7 +168,7 @@ public class PolicyManagementControllerIT extends AbstractTestNGSpringContextTes
             mockMvcContext.getMockMvc().perform(mockMvcContext.getBuilder()).andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("name").value(policySet2Name));
-            
+
             //assert that policy evaluation fails
             PolicyEvaluationRequestV1 evalRequest = new PolicyEvaluationRequestV1();
             evalRequest.setAction("GET");
