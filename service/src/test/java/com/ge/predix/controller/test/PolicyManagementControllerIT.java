@@ -106,7 +106,7 @@ public class PolicyManagementControllerIT extends AbstractTestNGSpringContextTes
         MockMvcContext putContext = this.testUtils.createWACWithCustomPUTRequestBuilder(this.wac,
                 this.testZone.getSubdomain(), thisUri);
         putContext.getMockMvc().perform(putContext.getBuilder().contentType(MediaType.APPLICATION_JSON)
-                .content(this.objectWriter.writeValueAsString(this.policySet))).andExpect(status().isBadRequest());
+                .content(this.objectWriter.writeValueAsString(this.policySet))).andExpect(status().isUnprocessableEntity());
     }
 
     public void testCreateSamePolicyDifferentZones() throws Exception {
