@@ -38,6 +38,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -94,7 +95,6 @@ public class PolicyEvaluationControllerIT extends AbstractTestNGSpringContextTes
         this.zoneService.upsertZone(this.testZone);
         MockSecurityContext.mockSecurityContext(this.testZone);
         MockAcsRequestContext.mockAcsRequestContext(this.testZone);
-
         this.testSubject = new BaseSubject("testSubject");
         this.testResource = new BaseResource("testResource");
         Assert.assertTrue(this.privilegeManagementService.upsertResource(this.testResource));
@@ -104,10 +104,30 @@ public class PolicyEvaluationControllerIT extends AbstractTestNGSpringContextTes
         this.notApplicableAndDenyPolicySets = createNotApplicableAndDenyPolicySets();
     }
 
+    @BeforeMethod
+    public void beforeMethod() {
+        MockSecurityContext.mockSecurityContext(this.testZone);
+        MockAcsRequestContext.mockAcsRequestContext(this.testZone);
+    }
+
     @AfterMethod
     public void testCleanup() {
         List<PolicySet> policySets = this.policyManagementService.getAllPolicySets();
         policySets.forEach(policySet -> this.policyManagementService.deletePolicySet(policySet.getName()));
+    }
+
+    @Test
+    public void testPolicyZoneDoesNotExistException() throws Exception {
+        MockSecurityContext.mockSecurityContext(null);
+        MockAcsRequestContext.mockAcsRequestContext(this.testZone);
+
+        MockMvcContext postPolicyEvalContext = this.testUtils
+                .createWACWithCustomPOSTRequestBuilder(this.wac, this.testZone.getSubdomain(), POLICY_EVAL_URL);
+        postPolicyEvalContext.getMockMvc().perform(
+                postPolicyEvalContext.getBuilder().contentType(MediaType.APPLICATION_JSON)
+                        .content("testString")).andExpect(status().isBadRequest());
+        MockSecurityContext.mockSecurityContext(this.testZone);
+        MockAcsRequestContext.mockAcsRequestContext(this.testZone);
     }
 
     @Test(dataProvider = "policyEvalDataProvider")

@@ -86,6 +86,15 @@ public class AttributeConnectorControllerIT extends AbstractTestNGSpringContextT
     }
 
     @Test(dataProvider = "requestUrlProvider")
+    public void attributeConnectorZoneDoesNotExistException(final String endpointUrl) throws Exception {
+        createZone1AndAssert();
+        MockSecurityContext.mockSecurityContext(null);
+        this.mockMvc.perform(
+                put(endpointUrl).contentType(MediaType.APPLICATION_JSON).content("testString"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test(dataProvider = "requestUrlProvider")
     public void testCreateAndGetAndDeleteConnector(final String endpointUrl) throws Exception {
         createZone1AndAssert();
 

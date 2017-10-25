@@ -27,8 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ge.predix.acs.request.context.AcsRequestContext;
-import com.ge.predix.acs.request.context.AcsRequestContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpStatus;
@@ -41,10 +39,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ge.predix.acs.privilege.management.PrivilegeManagementUtility;
+import com.ge.predix.acs.request.context.AcsRequestContext;
+import com.ge.predix.acs.request.context.AcsRequestContextHolder;
 import com.ge.predix.acs.rest.BaseResource;
 import com.ge.predix.acs.rest.Zone;
 import com.ge.predix.acs.testutils.MockAcsRequestContext;
@@ -83,8 +84,28 @@ public class ResourcePrivilegeManagementControllerIT extends AbstractTestNGSprin
         this.testZone2 = TEST_UTILS.createTestZone("ResourceMgmtControllerIT2");
         this.zoneService.upsertZone(this.testZone);
         this.zoneService.upsertZone(this.testZone2);
+    }
+
+    @BeforeMethod
+    public void beforeMethod() {
         MockSecurityContext.mockSecurityContext(this.testZone);
         MockAcsRequestContext.mockAcsRequestContext(this.testZone);
+    }
+
+    @Test
+    public void resourceZoneDoesNotExistException() throws Exception {
+        // NOTE: To throw a ZoneDoesNotExistException, we must ensure that the AcsRequestContext in the
+        //       SpringSecurityZoneResolver class returns a null ZoneEntity
+        MockSecurityContext.mockSecurityContext(null);
+        MockAcsRequestContext.mockAcsRequestContext(this.testZone);
+        BaseResource resource = JSON_UTILS.deserializeFromFile("controller-test/a-resource.json",
+                                                                    BaseResource.class);
+        String thisUri = RESOURCE_BASE_URL + "/%2Fservices%2Fsecured-api";
+        // create resource in first zone
+        MockMvcContext putContext =
+            TEST_UTILS.createWACWithCustomPUTRequestBuilder(this.wac, this.testZone.getSubdomain(), thisUri);
+        putContext.getMockMvc().perform(putContext.getBuilder().contentType(MediaType.APPLICATION_JSON)
+                .content(OBJECT_MAPPER.writeValueAsString(resource))).andExpect(status().isBadRequest());
     }
 
     @Test
