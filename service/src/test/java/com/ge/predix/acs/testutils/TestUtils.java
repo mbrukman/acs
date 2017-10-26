@@ -33,7 +33,6 @@ import com.ge.predix.acs.zone.management.ZoneService;
 import com.ge.predix.acs.zone.management.dao.ZoneEntity;
 
 /**
- *
  * @author 212304931
  */
 public class TestUtils {
@@ -118,6 +117,12 @@ public class TestUtils {
 
     public static class TestAssertion {
         public static void assertDoesNotThrow(final Class<?> unexpectedException, final Runnable executableCode) {
+
+            /*
+            TODO We should Start moving tests to use this assertDoesNotThrow method wherever we use the try { ...
+            } catch (Exception e) { Assert.fail(); }
+
+            */
             try {
                 executableCode.run();
             } catch (Exception e) {
