@@ -68,8 +68,6 @@
 
         <jackson.version>2.6.7</jackson.version>
         <jedis.version>2.9.0</jedis.version>
-        <spring-metering-filter.version>1.2.4</spring-metering-filter.version>
-        <spring-data-redis.version>1.6.4.RELEASE</spring-data-redis.version>
         <spring-log-filter.version>1.1.3</spring-log-filter.version>
         <springfox.swagger.version>2.6.1</springfox.swagger.version>
         <google.guava.version>18.0</google.guava.version>

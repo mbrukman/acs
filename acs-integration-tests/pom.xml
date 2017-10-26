@@ -28,11 +28,8 @@
     </parent>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <nurego-java.version>1.0.18</nurego-java.version>
         <zone.var>pipe</zone.var>
         <acs.zone.subdomain>test-zone-${zone.var}</acs.zone.subdomain>
-        <exec-maven-plugin.version>1.5.0</exec-maven-plugin.version>
     </properties>
 
     <build>
@@ -213,17 +210,6 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>log4j-over-slf4j</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.nurego</groupId>
-            <artifactId>nurego-java</artifactId>
-            <version>${nurego-java.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-lang</groupId>
-                    <artifactId>commons-lang</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
