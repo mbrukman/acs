@@ -71,7 +71,7 @@ public class PolicySet {
      * @param obligations
      *            the obligations for this policy set
      */
-    public void setObligations(List<Obligation> obligations) {
+    public void setObligations(final List<Obligation> obligations) {
         this.obligations = obligations;
     }
 
@@ -87,7 +87,8 @@ public class PolicySet {
     @SuppressWarnings("nls")
     @Override
     public String toString() {
-        return "PolicySet [policies=" + this.policies + ", name=" + this.name + "]";
+        return "PolicySet [policies=" + this.policies + ", obligations=" + this.obligations + ", name=" + this.name
+                + "]";
     }
 
 }

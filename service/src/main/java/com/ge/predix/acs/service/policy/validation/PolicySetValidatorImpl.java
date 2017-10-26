@@ -77,6 +77,31 @@ public class PolicySetValidatorImpl implements PolicySetValidator {
 
     private Set<String> validAcsPolicyHttpActionsSet;
 
+    private static final String EXCEP_POLICY_OBL_IDS_NULL_EMPTY = "Policy validation failed. obligationsIds cannot"
+            + " contain null or empty values for policy: [%s]";
+
+    private static final String EXCEP_OBL_IDS_REPEATED = "Obligation validation failed. Obligation ids need to unique."
+            + " Repeated values:  %s";
+
+    private static final String EXCEP_OBL_ACTION_ARG_NULL_BLANK = "Obligation validation failed. actionArgument [%s]  "
+            + "cannot be null or blank on [index: [%d] , actionArgument index: [%d] ]";
+
+    private static final String EXCEP_OBL_ACTION_ARG_NULL = "Obligation validation failed. actionArgument [%s]  "
+            + "cannot be null [index: [%d] , actionArgument index: [%d] ]";
+
+    private static final String EXCEP_OBL_ACTION_ARG_DUPLICATED = "Obligation validation failed. actionArguments names "
+            + "cannot be repeated on  index : [%d], values: [%s]";
+
+    private static final String EXCEP_OBL_ID_NULL_BLANK = "Obligation validation failed. id cannot be null or blank "
+            + "on index: [%s]";
+
+    private static final String EXCEP_OBL_ACTION_TEMPLATE_NULL_BLANK = "Obligation validation failed. actionTemplate"
+            + " cannot be null or empty on index: [%s]";
+
+    private static final String EXCEP_POLICY_OBL_IDS_NOT_FOUND = "Policy validation failed. The following "
+            + "obligationsIds  does not match with the obligations defined for this policy set. [ policy: [%s]"
+            + ", obligationIds: %s ]";
+
     @Override
     public void removeCachedConditions(final PolicySet policySet) {
         for (Policy policy : policySet.getPolicies()) {
@@ -97,64 +122,48 @@ public class PolicySetValidatorImpl implements PolicySetValidator {
         }
     }
 
-    private void vaLidatePolicyObligations(List<String> obligationIds, Policy policy) {
-        List<String> notFound = new ArrayList<String>();
-        for (String obligationId : policy.getObligationIds()) {
-            if (StringUtils.isEmpty(obligationId)) {
-                throw new PolicySetValidationException(String.format(
-                        "Policy validation failed. obligationsIds cannot contain null or empty values for policy: [%s]",
-                        policy.getName()));
-
-            } else if (!obligationIds.contains(obligationId)) {
-                notFound.add(obligationId);
-
-            }
-        }
-        if (!notFound.isEmpty()) {
-            throw new PolicySetValidationException(String.format(
-                    "Policy validation failed. The following obligationsIds does not match with the obligations defined for this policy set. [ policy: [%s], obligationIds: [%s] ]",
-                    policy.getName(), Arrays.toString(notFound.toArray())));
-        }
-
-    }
-
     @SuppressWarnings("unchecked")
     private List<String> validateObligationsAndGetIds(final List<Obligation> obligations) {
         List<String> ids = new ArrayList<String>();
+        List<String> repeatedIds = new ArrayList<String>();
         AtomicInteger index = new AtomicInteger(0);
 
         for (Obligation obligation : obligations) {
             if (StringUtils.isEmpty(obligation.getId())) {
-                throw new PolicySetValidationException(String.format(
-                        "Obligation validation failed. id cannot be null or blank on index: [%s] ", index.get()));
+                throw new PolicySetValidationException(String.format(EXCEP_OBL_ID_NULL_BLANK, index.get()));
             }
+            if (ids.contains(obligation.getId())) {
+                repeatedIds.add(obligation.getId());
+            }
+
             if (null == obligation.getActionTemplate()
                     || ((Map<Object, Object>) obligation.getActionTemplate()).size() == 0) {
-                throw new PolicySetValidationException(String.format(
-                        "Obligation validation failed. actionTemplate cannot be null or empty on index: [%s]",
-                        index.get()));
+                throw new PolicySetValidationException(
+                        String.format(EXCEP_OBL_ACTION_TEMPLATE_NULL_BLANK, index.get()));
             }
             validateActionArguments(index.get(), obligation.getActionArguments());
             ids.add(obligation.getId());
             index.incrementAndGet();
         }
+        if (!CollectionUtils.isEmpty(repeatedIds)) {
+            throw new PolicySetValidationException(
+                    String.format(EXCEP_OBL_IDS_REPEATED, Arrays.toString(repeatedIds.toArray())));
+        }
         return ids;
     }
 
-    private void validateActionArguments(final int obligationIndex, List<ActionArgument> actionArguments) {
+    private void validateActionArguments(final int obligationIndex, final List<ActionArgument> actionArguments) {
         AtomicInteger index = new AtomicInteger(0);
         List<String> iteratedActionArguments = new ArrayList<String>();
         List<String> duplicatedActionArguments = new ArrayList<String>();
         for (ActionArgument actionArgument : actionArguments) {
             if (StringUtils.isEmpty(actionArgument.getName())) {
-                throw new PolicySetValidationException(String.format(
-                        "Obligation validation failed. actionArgument [%s]  cannot be null or blank on [index: [%d] , actionArgument index: [%d] ]",
-                        "name", obligationIndex, index.get()));
+                throw new PolicySetValidationException(
+                        String.format(EXCEP_OBL_ACTION_ARG_NULL_BLANK, "name", obligationIndex, index.get()));
             }
-            if (StringUtils.isEmpty(actionArgument.getValue())) {
-                throw new PolicySetValidationException(String.format(
-                        "Obligation validation failed. actionArgument [%s]  cannot be null or blank on [index: [%d] , actionArgument index: [%d] ]",
-                        "value", obligationIndex, index.get()));
+            if (null == actionArgument.getValue()) {
+                throw new PolicySetValidationException(
+                        String.format(EXCEP_OBL_ACTION_ARG_NULL, "value", obligationIndex, index.get()));
             }
             if (iteratedActionArguments.contains(actionArgument.getName())) {
                 duplicatedActionArguments.add(actionArgument.getName());
@@ -163,9 +172,8 @@ public class PolicySetValidatorImpl implements PolicySetValidator {
             index.incrementAndGet();
         }
         if (!CollectionUtils.isEmpty(duplicatedActionArguments)) {
-            throw new PolicySetValidationException(String.format(
-                    "Obligation validation failed. actionArguments names cannot be repeated on  index : [%d], values: [%s] ",
-                    obligationIndex, Arrays.toString(duplicatedActionArguments.toArray())));
+            throw new PolicySetValidationException(String.format(EXCEP_OBL_ACTION_ARG_DUPLICATED, obligationIndex,
+                    Arrays.toString(duplicatedActionArguments.toArray())));
         }
 
     }
@@ -190,6 +198,25 @@ public class PolicySetValidatorImpl implements PolicySetValidator {
                 }
             }
         }
+    }
+
+    private void vaLidatePolicyObligations(final List<String> obligationIds, final Policy policy) {
+        List<String> notFound = new ArrayList<String>();
+        for (String obligationId : policy.getObligationIds()) {
+            if (StringUtils.isEmpty(obligationId)) {
+                throw new PolicySetValidationException(
+                        String.format(EXCEP_POLICY_OBL_IDS_NULL_EMPTY, policy.getName()));
+
+            } else if (!obligationIds.contains(obligationId)) {
+                notFound.add(obligationId);
+
+            }
+        }
+        if (!notFound.isEmpty()) {
+            throw new PolicySetValidationException(String.format(EXCEP_POLICY_OBL_IDS_NOT_FOUND, policy.getName(),
+                    Arrays.toString(notFound.toArray())));
+        }
+
     }
 
     private void validateSchema(final PolicySet policySet) {

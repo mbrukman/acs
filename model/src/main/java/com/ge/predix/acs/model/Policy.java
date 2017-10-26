@@ -18,6 +18,7 @@ package com.ge.predix.acs.model;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -32,7 +33,7 @@ public class Policy {
     private String name;
     private Target target;
     private List<Condition> conditions = Collections.emptyList();
-    private List<String> obligationIds = Collections.emptyList();
+    private Set<String> obligationIds = Collections.emptySet();
     private Effect effect;
 
     public String getName() {
@@ -71,7 +72,7 @@ public class Policy {
     /**
      * @return the obligationIds
      */
-    public List<String> getObligationIds() {
+    public Set<String> getObligationIds() {
         return this.obligationIds;
     }
 
@@ -79,7 +80,7 @@ public class Policy {
      * @param obligationIds
      *            the obligationIds to set
      */
-    public void setObligationIds(List<String> obligationIds) {
+    public void setObligationIds(final Set<String> obligationIds) {
         this.obligationIds = obligationIds;
     }
 
@@ -95,8 +96,8 @@ public class Policy {
     @SuppressWarnings("nls")
     @Override
     public String toString() {
-        return "Policy [name=" + this.name + ", target=" + this.target + ", conditions=" + this.conditions + ", effect="
-                + this.effect + "]";
+        return "Policy [name=" + this.name + ", target=" + this.target + ", conditions=" + this.conditions
+                + ", obligationIds=" + this.obligationIds + ", effect=" + this.effect + "]";
     }
 
 }
