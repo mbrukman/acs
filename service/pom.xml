@@ -577,22 +577,6 @@
             </activation>
             <build>
                 <plugins>
-                    <!-- TODO: Once we isolate predix related files (including audit) into predix branch, -->
-                    <!-- compiler plugin configuration that explicitly excludes audit files could be removed -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <source>${maven.compiler.source}</source>
-                            <target>${maven.compiler.target}</target>
-                            <excludes>
-                                <exclude>com/ge/predix/acs/audit/*</exclude>
-                            </excludes>
-                            <testExcludes>
-                                <testExclude>com/ge/predix/acs/audit/*</testExclude>
-                            </testExcludes>
-                        </configuration>
-                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
@@ -650,26 +634,6 @@
 
         <profile>
             <id>public-titan</id>
-            <build>
-                <plugins>
-                    <!-- TODO: Once we isolate predix related files (including audit) into predix branch, -->
-                    <!-- compiler plugin configuration that explicitly excludes audit files could be removed -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <source>${maven.compiler.source}</source>
-                            <target>${maven.compiler.target}</target>
-                            <excludes>
-                                <exclude>com/ge/predix/acs/audit/*</exclude>
-                            </excludes>
-                            <testExcludes>
-                                <testExclude>com/ge/predix/acs/audit/*</testExclude>
-                            </testExcludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>

@@ -515,64 +515,6 @@
 
         <profile>
             <id>acceptance</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.ge.predix.audit</groupId>
-                    <artifactId>audit-sdk</artifactId>
-                    <version>${audit-sdk.version}</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>commons-io</groupId>
-                            <artifactId>commons-io</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>io.netty</groupId>
-                            <artifactId>netty-handler</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>io.netty</groupId>
-                            <artifactId>netty-codec-http</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>com.ge.predix.eventhub</groupId>
-                    <artifactId>predix-event-hub-sdk</artifactId>
-                    <version>1.2.2-SNAPSHOT</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>io.grpc</groupId>
-                            <artifactId>grpc-stub</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>io.grpc</groupId>
-                            <artifactId>grpc-protobuf</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>io.netty</groupId>
-                            <artifactId>netty-handler</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>commons-io</groupId>
-                            <artifactId>commons-io</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>io.netty</groupId>
-                            <artifactId>netty-codec-http</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>io.grpc</groupId>
-                    <artifactId>grpc-stub</artifactId>
-                    <version>1.0.1</version>
-                </dependency>
-                <dependency>
-                    <groupId>io.grpc</groupId>
-                    <artifactId>grpc-protobuf</artifactId>
-                    <version>1.0.1</version>
-                </dependency>
-            </dependencies>
             <build>
                 <plugins>
                     <plugin>
