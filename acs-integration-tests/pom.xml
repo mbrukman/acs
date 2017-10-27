@@ -27,11 +27,6 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <properties>
-        <zone.var>pipe</zone.var>
-        <acs.zone.subdomain>test-zone-${zone.var}</acs.zone.subdomain>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
