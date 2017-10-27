@@ -209,6 +209,21 @@ public class AccessControlServiceIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dataProvider = "endpointProvider")
+    public void testCreationOfValidPolicyWithObligations(final String endpoint) throws Exception {
+        String policyFile = "src/test/resources/single-site-based-policy-obligation-set.json";
+        PolicySet testPolicyset = this.policyHelper.setTestPolicySet(
+                this.acsitSetUpFactory.getAcsZoneAdminRestTemplate(), this.acsitSetUpFactory.getZone1Headers(),
+                endpoint, policyFile);
+        String testPolicyName = testPolicyset.getName();
+        PolicySet policySetSaved = this.getPolicySet(this.acsitSetUpFactory.getAcsZoneAdminRestTemplate(),
+                testPolicyName, this.acsitSetUpFactory.getZone1Headers(), endpoint);
+        Assert.assertEquals(testPolicyName, policySetSaved.getName());
+        Assert.assertEquals(testPolicyset.getObligations().size(), policySetSaved.getObligations().size());
+        this.policyHelper.deletePolicySet(this.acsitSetUpFactory.getAcsZoneAdminRestTemplate(),
+                this.acsitSetUpFactory.getAcsUrl(), testPolicyName, this.acsitSetUpFactory.getZone1Headers());
+    }
+
+    @Test(dataProvider = "endpointProvider")
     public void testPolicyCreationInValidPolicy(final String endpoint) throws Exception {
         String testPolicyName = "";
         try {
@@ -217,6 +232,23 @@ public class AccessControlServiceIT extends AbstractTestNGSpringContextTests {
                     this.acsitSetUpFactory.getZone1Headers(), endpoint, policyFile);
         } catch (HttpClientErrorException e) {
             this.acsTestUtil.assertExceptionResponseBody(e, "policy set name is missing");
+            Assert.assertEquals(e.getStatusCode(), HttpStatus.UNPROCESSABLE_ENTITY);
+            return;
+        }
+        this.policyHelper.deletePolicySet(this.acsitSetUpFactory.getAcsZoneAdminRestTemplate(),
+                this.acsitSetUpFactory.getAcsUrl(), testPolicyName, this.acsitSetUpFactory.getZone1Headers());
+        Assert.fail("testPolicyCreationInValidPolicy should have failed");
+    }
+    
+    @Test(dataProvider = "endpointProvider")
+    public void testPolicyCreationInValidObligationPolicy(final String endpoint) throws Exception {
+        String testPolicyName = "";
+        try {
+            String policyFile = "src/test/resources/missing-obligation-name-policy-obligation-set.json";
+            testPolicyName = this.policyHelper.setTestPolicy(this.acsitSetUpFactory.getAcsZoneAdminRestTemplate(),
+                    this.acsitSetUpFactory.getZone1Headers(), endpoint, policyFile);
+        } catch (HttpClientErrorException e) {
+            this.acsTestUtil.assertExceptionResponseBody(e, "Obligation validation failed. id cannot be null or blank");
             Assert.assertEquals(e.getStatusCode(), HttpStatus.UNPROCESSABLE_ENTITY);
             return;
         }
