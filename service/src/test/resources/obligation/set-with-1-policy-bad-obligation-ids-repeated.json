@@ -55,7 +55,7 @@
 			"id": "obligation1",
 			"type": "CUSTOM",
 			"actionTemplate": {
-				"filter": "where site = '$1",
+				"filter": "where site = $1",
 				"select": [
 					{
 						"name": "firstName"
