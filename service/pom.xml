@@ -466,13 +466,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire.version}</version>
                 <configuration>
-                    <environmentVariables>
-                        <SPRING_PROFILES_ACTIVE>h2,public,simple-cache,titan</SPRING_PROFILES_ACTIVE>
-                    </environmentVariables>
                     <argLine>${custom-argline}</argLine>
-                    <!-- us32088: Place test reports outside of target directory so reports are not removed by 'mvn clean'
-                         and retained by Jenkins for each profile -->
-                    <reportsDirectory>${basedir}/surefire-reports-titan</reportsDirectory>
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/unit-tests.xml</suiteXmlFile>
                     </suiteXmlFiles>
@@ -484,17 +478,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven-failsafe.version}</version>
                 <configuration>
-                    <environmentVariables>
-                        <SPRING_PROFILES_ACTIVE>h2,public,simple-cache,titan</SPRING_PROFILES_ACTIVE>
-                    </environmentVariables>
                     <argLine>${custom-argline}</argLine>
-                    <!-- us32088: Place test reports outside of target directory so reports are not removed by 'mvn clean'
-                         and retained by Jenkins for each profile -->
-                    <reportsDirectory>${basedir}/surefire-reports-titan/controller-tests</reportsDirectory>
-                    <summaryFile>${basedir}/surefire-reports-titan/controller-tests/failsafe-summary.xml</summaryFile>
-                    <excludes>
-                        <exclude>**/NonHierarchical*IT.java</exclude>
-                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
@@ -563,16 +547,10 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>${maven-surefire.version}</version>
                         <configuration>
-                            <argLine>${custom-argline}</argLine>
                             <environmentVariables>
                                 <SPRING_PROFILES_ACTIVE>h2,public,simple-cache</SPRING_PROFILES_ACTIVE>
                             </environmentVariables>
-                            <!-- us32088: Place test reports outside of target directory so reports are not removed by 'mvn clean'
-                                 and retained by Jenkins for each profile -->
                             <reportsDirectory>${basedir}/surefire-reports</reportsDirectory>
-                            <suiteXmlFiles>
-                                <suiteXmlFile>src/test/resources/unit-tests.xml</suiteXmlFile>
-                            </suiteXmlFiles>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -580,12 +558,9 @@
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <version>${maven-failsafe.version}</version>
                         <configuration>
-                            <argLine>${custom-argline}</argLine>
-                            <environmentVariables>
+                             <environmentVariables>
                                 <SPRING_PROFILES_ACTIVE>h2,public,simple-cache</SPRING_PROFILES_ACTIVE>
                             </environmentVariables>
-                            <!-- us32088: Place test reports outside of target directory so reports are not removed by 'mvn clean'
-                                 and retained by Jenkins for each profile -->
                             <reportsDirectory>${basedir}/surefire-reports/controller-tests</reportsDirectory>
                             <summaryFile>${basedir}/surefire-reports/controller-tests/failsafe-summary.xml</summaryFile>
                             <excludes>
@@ -594,20 +569,6 @@
                                 <exclude>**/Hierarchical*IT.java</exclude>
                             </excludes>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <id>integration-test</id>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>verify</id>
-                                <goals>
-                                    <goal>verify</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -615,6 +576,36 @@
 
         <profile>
             <id>public-titan</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${maven-surefire.version}</version>
+                        <configuration>
+                            <environmentVariables>
+                                <SPRING_PROFILES_ACTIVE>h2,public,simple-cache,titan</SPRING_PROFILES_ACTIVE>
+                            </environmentVariables>
+                            <reportsDirectory>${basedir}/surefire-reports-titan</reportsDirectory>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${maven-failsafe.version}</version>
+                        <configuration>
+                            <environmentVariables>
+                                <SPRING_PROFILES_ACTIVE>h2,public,simple-cache,titan</SPRING_PROFILES_ACTIVE>
+                            </environmentVariables>
+                            <reportsDirectory>${basedir}/surefire-reports-titan/controller-tests</reportsDirectory>
+                            <summaryFile>${basedir}/surefire-reports-titan/controller-tests/failsafe-summary.xml</summaryFile>
+                            <excludes>
+                                <exclude>**/NonHierarchical*IT.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

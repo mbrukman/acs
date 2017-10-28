@@ -88,22 +88,18 @@
         <maven-surefire.version>2.20</maven-surefire.version>
         <maven-failsafe.version>2.20</maven-failsafe.version>
         <custom-argline>-Xms512m -Xmx1024m -XX:MaxMetaspaceSize=512m</custom-argline>
-
     </properties>
 
-    <repositories>
+    <distributionManagement>
         <repository>
-            <id>staging</id>
-            <name>Maven Staging Repo</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
-    </repositories>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <!-- This allows child modules to use dependency versions declared here. -->
     <dependencyManagement>

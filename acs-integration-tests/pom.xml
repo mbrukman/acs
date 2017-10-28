@@ -127,6 +127,7 @@
                 <configuration>
                     <skipTests>false</skipTests>
                     <parallel>false</parallel>
+                    <argLine>${custom-argline}</argLine>
                     <properties>
                         <property>
                             <name>listener</name>
