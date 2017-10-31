@@ -158,6 +158,11 @@ public class ACSITSetUpFactoryPublic implements ACSITSetUpFactory {
     }
 
     @Override
+    public String getAcsZone1Name() {
+        return this.acsZone1Name;
+    }
+
+    @Override
     public String getAcsZone3Name() {
         return this.acsZone3Name;
     }
@@ -170,6 +175,16 @@ public class ACSITSetUpFactoryPublic implements ACSITSetUpFactory {
     @Override
     public OAuth2RestTemplate getAcsAdminRestTemplate2() {
         return this.acsAdminRestTemplate2;
+    }
+
+    @Override
+    public OAuth2RestTemplate getAcsZoneConnectorAdminRestTemplate(final String zone) {
+        return this.uaaTestUtil.createAdminConnectorScopeClient(zone);
+    }
+
+    @Override
+    public OAuth2RestTemplate getAcsZoneConnectorReadRestTemplate(final String zone) {
+        return this.uaaTestUtil.createReadOnlyConnectorScopeClient(zone);
     }
 
 }
